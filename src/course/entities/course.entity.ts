@@ -22,7 +22,7 @@ export class Course {
   description: string;
 
   @Column()
-  credits: number;
+  credits: string;
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments: Enrollment[];

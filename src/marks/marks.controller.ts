@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
 import { MarksService } from './marks.service';
 import { CreateMarkDto } from './dto/create-mark.dto';
-// import { UpdateMarkDto } from './dto/update-mark.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('marks')
 export class MarksController {
   constructor(private readonly marksService: MarksService) {}
@@ -12,23 +13,13 @@ export class MarksController {
     return this.marksService.create(createMarkDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.marksService.findAll();
-  // }
+  @Get('student/:student_id')
+  findByStudent(@Param('student_id') student_id: string) {
+    return this.marksService.findByStudent(student_id);
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.marksService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateMarkDto: UpdateMarkDto) {
-  //   return this.marksService.update(+id, updateMarkDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.marksService.remove(+id);
-  // }
+  @Get('course/:course_id')
+  findByCourse(@Param('course_id') course_id: string) {
+    return this.marksService.findByCourse(course_id);
+  }
 }

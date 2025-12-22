@@ -2,16 +2,17 @@ import {
   Controller,
   Get,
   Post,
+  UseGuards,
   Body,
-  Patch,
   Param,
   Delete,
 } from '@nestjs/common';
 import { EnrollmentService } from './enrollment.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
-import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('enrollment')
+@UseGuards(AuthGuard)
+@Controller('enrollments')
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
@@ -20,22 +21,14 @@ export class EnrollmentController {
     return this.enrollmentService.create(createEnrollmentDto);
   }
 
-  @Get()
-  findAll() {
-    return this.enrollmentService.findAll();
+  @Get('students/:student_id')
+  findStudentCourses(@Param('student_id') student_id: string) {
+    return this.enrollmentService.findStudentCourses(student_id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.enrollmentService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateEnrollmentDto: UpdateEnrollmentDto,
-  ) {
-    return this.enrollmentService.update(id, updateEnrollmentDto);
+  @Get('courses/:course_id')
+  findCourseStudents(@Param('course_id') course_id: string) {
+    return this.enrollmentService.findCourseStudents(course_id);
   }
 
   @Delete(':id')

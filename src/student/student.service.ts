@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Student } from './entities/student.entity';
@@ -17,16 +17,64 @@ export class StudentService {
     return this.studentRepository.save(student);
   }
 
-  findAll() {
-    return this.studentRepository.find();
+  async findAll(
+    search?: string,
+    status?: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const skip = (page - 1) * limit;
+
+    // Query Builder start karein
+    const query = this.studentRepository.createQueryBuilder('student');
+
+    // 1. Status Filter
+    if (status) {
+      query.andWhere('student.status = :status', { status });
+    }
+
+    // 2. Search Filter (First Name, Last Name ya Email par search karega)
+    if (search) {
+      query.andWhere(
+        '(student.first_name LIKE :search OR student.last_name LIKE :search OR student.email LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    // 3. Pagination Apply karein
+    query.skip(skip).take(limit);
+
+    // 4. Data aur Total count layein
+    const [data, total] = await query.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        last_page: Math.ceil(total / limit),
+      },
+    };
   }
-  findOne(id: string) {
-    return this.studentRepository.findOneBy({ student_id: id });
+  async findOne(student_id: string) {
+    const student = await this.studentRepository.findOne({
+      where: { student_id: student_id },
+    });
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${student_id} not found`);
+    }
+    return student;
   }
-  update(id: string, updateStudentDto: UpdateStudentDto) {
-    return this.studentRepository.update(id, updateStudentDto);
+
+  async update(student_id: string, updateStudentDto: UpdateStudentDto) {
+    const student = await this.findOne(student_id);
+    Object.assign(student, updateStudentDto);
+    return await this.studentRepository.save(student);
   }
-  remove(id: string) {
-    return this.studentRepository.delete(id);
+
+  async remove(student_id: string) {
+    const student = await this.findOne(student_id);
+    return await this.studentRepository.remove(student);
   }
 }
