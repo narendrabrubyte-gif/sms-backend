@@ -9,17 +9,17 @@ export class MarksController {
   constructor(private readonly marksService: MarksService) {}
 
   @Post()
-  create(@Body() createMarkDto: CreateMarkDto) {
-    return this.marksService.create(createMarkDto);
+  public async assignMarks(@Body() createMarkDto: CreateMarkDto) {
+    return await this.marksService.addMarks(createMarkDto);
   }
 
   @Get('student/:student_id')
-  findByStudent(@Param('student_id') student_id: string) {
-    return this.marksService.findByStudent(student_id);
+  public async findByStudent(@Param('student_id') student_id: string) {
+    return await this.marksService.findByStudent(student_id);
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id') course_id: string) {
-    return this.marksService.findByCourse(course_id);
+  public async findByCourse(@Param('course_id') course_id: string) {
+    return await this.marksService.findByCourse(course_id);
   }
 }

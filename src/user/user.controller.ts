@@ -6,37 +6,49 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly _userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  public async addUser(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
+    return await this._userService.createUser(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  public async getUserList(): Promise<UserDto[]> {
+    return await this._userService.getUserList();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  public async getUserById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<UserDto> {
+    return await this._userService.getUserById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  public async updateUserInfo(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserDto> {
+    return await this._userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  public async deleteUser(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this._userService.removeUser(id);
   }
 }

@@ -10,27 +10,27 @@ import { StudentStatus } from '../entities/student.entity';
 export class CreateStudentDto {
   @IsString()
   @IsNotEmpty()
-  first_name: string;
+  public first_name: string;
 
   @IsString()
   @IsNotEmpty()
-  last_name: string;
+  public last_name: string;
 
   @IsEmail()
-  email: string;
+  public email: string;
 
   @IsString()
-  phone: string;
+  public phone: string;
 
   @IsDateString()
-  dob: string;
+  public dob: string;
 
   @IsString()
-  gender: string;
+  public gender: string;
 
   @IsString()
-  address: string;
+  public address: string;
 
   @IsEnum(StudentStatus)
-  status: StudentStatus;
+  public status: StudentStatus;
 }

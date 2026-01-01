@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { Brackets, EntityManager } from 'typeorm';
 import { Student } from './entities/student.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -42,33 +42,37 @@ export class StudentService {
   }> {
     const skip = (page - 1) * limit;
 
-    const query = this.entityManager.createQueryBuilder(Student, 'student');
+    const whereClause = this.entityManager.createQueryBuilder(
+      Student,
+      'student',
+    );
 
     if (status) {
-      query.andWhere('student.status = :status', { status });
+      whereClause.andWhere('student.status= :ststus', { status });
     }
 
     if (search) {
-      query.andWhere(
-        '(student.first_name LIKE :search OR student.last_name LIKE :search OR student.email LIKE :search)',
+      whereClause.andWhere(
+        new Brackets((whereClause) => {
+          whereClause
+            .where('student.first_name LIKE :search')
+            .orWhere('student.last_name LIKE :search')
+            .orWhere('student.email LIKE :search');
+        }),
         { search: `%${search}%` },
       );
     }
 
-    query.skip(skip).take(limit);
+    whereClause.orderBy('student.created_at', 'DESC').take(limit).skip(skip);
 
-    query.orderBy('student.created_at', 'DESC');
-
-    const [data, total] = await query.getManyAndCount();
+    const [student, total]: [Student[], number] =
+      await whereClause.getManyAndCount();
 
     return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        last_page: Math.ceil(total / limit),
-      },
+      data: student.map((student: Student) =>
+        StudentDto.createFromEntity(student),
+      ),
+      meta: { total, limit, page, last_page: Math.ceil(total / limit) },
     };
   }
 

@@ -16,26 +16,26 @@ export class Course {
   public readonly course_id: string;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column({ type: 'text' })
-  description: string;
+  public description: string;
 
   @Column()
-  credits: string;
+  public credits: string;
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
-  enrollments: Enrollment[];
+  public enrollments: Enrollment[];
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  public created_at: Date;
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
+  public updated_at: Date;
 
   @OneToMany(() => Mark, (mark) => mark.course)
-  marks: Mark[];
+  public marks: Mark[];
 
   @OneToMany(() => Attendance, (attendance) => attendance.course)
-  attendances: Attendance[];
+  public attendances: Attendance[];
 }

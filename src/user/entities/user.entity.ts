@@ -12,20 +12,20 @@ export class User {
   public readonly user_id: string;
 
   @Column({ type: 'enum', enum: UserRole })
-  role: UserRole;
+  public role: UserRole;
 
   @Column({ unique: true })
-  name: string;
+  public name: string;
 
   @Column({ unique: true })
-  email: string;
+  public email: string;
 
   @Column()
-  password_hash: string;
-  password?: string;
+  public password_hash: string;
+  public password?: string;
 
   @BeforeInsert()
-  async hashPassword() {
+  public async hashPassword() {
     if (this.password) {
       const saltRounds = 10;
       this.password_hash = await bcrypt.hash(this.password, saltRounds);

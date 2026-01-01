@@ -13,22 +13,22 @@ export enum AttendanceStatus {
 export class CreateAttendanceDto {
   @IsString()
   @IsNotEmpty()
-  student_id: string;
+  public student_id: string;
 
   @IsString()
   @IsNotEmpty()
-  course_id: string;
+  public course_id: string;
 
   @IsDateString()
   @IsNotEmpty()
-  date: Date;
+  public date: Date;
 
   @IsString()
   @IsNotEmpty()
   @IsEnum(AttendanceStatus)
-  status: AttendanceStatus;
+  public status: AttendanceStatus;
 
   @IsString()
   @IsOptional()
-  remarks: string;
+  public remarks: string;
 }

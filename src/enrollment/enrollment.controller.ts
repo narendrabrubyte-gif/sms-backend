@@ -6,6 +6,9 @@ import {
   Body,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { EnrollmentService } from './enrollment.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
@@ -17,22 +20,29 @@ export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
   @Post()
-  create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
-    return this.enrollmentService.create(createEnrollmentDto);
+  public async addEnrollment(@Body() createEnrollmentDto: CreateEnrollmentDto) {
+    return await this.enrollmentService.addEnrollment(createEnrollmentDto);
   }
 
   @Get('students/:student_id')
-  findStudentCourses(@Param('student_id') student_id: string) {
-    return this.enrollmentService.findStudentCourses(student_id);
+  public async getStudentCourses(
+    @Param('student_id', ParseUUIDPipe) student_id: string,
+  ) {
+    return await this.enrollmentService.getStudentCourses(student_id);
   }
 
   @Get('courses/:course_id')
-  findCourseStudents(@Param('course_id') course_id: string) {
-    return this.enrollmentService.findCourseStudents(course_id);
+  public async getCourseStudents(
+    @Param('course_id', ParseUUIDPipe) course_id: string,
+  ) {
+    return await this.enrollmentService.getCourseStudents(course_id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.enrollmentService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async deleteEnrollment(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.enrollmentService.deleteEnrollment(id);
   }
 }

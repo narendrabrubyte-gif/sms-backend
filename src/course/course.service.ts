@@ -1,46 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Course } from './entities/course.entity';
+
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { Brackets, EntityManager } from 'typeorm';
+import { CourseDto } from './dto/course.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { Course } from './entities/course.entity';
 
 @Injectable()
 export class CourseService {
   constructor(
-    @InjectRepository(Course)
-    private courseRepository: Repository<Course>,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
-  async create(createCourseDto: CreateCourseDto): Promise<Course> {
-    const course = this.courseRepository.create(createCourseDto);
-    return this.courseRepository.save(course);
+  public async createCourse(
+    createCourseDto: CreateCourseDto,
+  ): Promise<CourseDto> {
+    const course = this.entityManager.create(Course, createCourseDto);
+    return await this.entityManager.save(course);
   }
 
-  async findAll(search?: string, page: number = 1, limit: number = 10) {
+  public async getCourseList(
+    search?: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{
+    data: CourseDto[];
+    meta: { total: number; page: number; limit: number; last_page: number };
+  }> {
     const skip = (page - 1) * limit;
 
-    // Query Builder start karein
-    const query = this.courseRepository.createQueryBuilder('course');
+    const whereClause = this.entityManager.createQueryBuilder(Course, 'course');
 
     if (search) {
-      query.andWhere('(course.name LIKE :search)', { search: `%${search}%` });
+      whereClause.andWhere(
+        new Brackets((whereClause) => {
+          whereClause.andWhere('course.name LIKE :search');
+        }),
+        { search: `%${search}%` },
+      );
     }
-    query.skip(skip).take(limit);
-    const [data, total] = await query.getManyAndCount();
+
+    whereClause.orderBy('course.created_at', 'DESC').take(limit).skip(skip);
+
+    const [course, total]: [Course[], number] =
+      await whereClause.getManyAndCount();
 
     return {
-      data,
+      data: course.map((course: Course) => CourseDto.createFromEntity(course)),
       meta: {
         total,
-        page,
         limit,
+        page,
         last_page: Math.ceil(total / limit),
       },
     };
   }
-  async findOne(course_id: string) {
-    const course = await this.courseRepository.findOne({
+
+  public async getCourseById(course_id: string): Promise<CourseDto> {
+    const course = await this.entityManager.findOne(Course, {
       where: { course_id: course_id },
     });
     if (!course) {
@@ -48,17 +67,20 @@ export class CourseService {
     }
     return course;
   }
-  async update(course_id: string, updateCourseDto: UpdateCourseDto) {
-    const course = await this.findOne(course_id);
+  public async updateCourse(
+    course_id: string,
+    updateCourseDto: UpdateCourseDto,
+  ): Promise<CourseDto> {
+    const course = await this.getCourseById(course_id);
     Object.assign(course, updateCourseDto);
-    return await this.courseRepository.save(course);
+    return await this.entityManager.save(course);
   }
 
-  async remove(course_id: string) {
-    const course = await this.findOne(course_id);
+  public async deleteCourse(course_id: string): Promise<void> {
+    const course = await this.getCourseById(course_id);
     if (!course) {
       throw new NotFoundException(`Course with ID ${course_id} not found`);
     }
-    await this.courseRepository.remove(course);
+    await this.entityManager.remove(course);
   }
 }

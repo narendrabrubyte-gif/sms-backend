@@ -9,16 +9,21 @@ import { UserRole } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsEnum(UserRole)
-  role: UserRole;
+  public role: UserRole;
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  public name: string;
 
   @IsEmail()
-  email: string;
+  @IsNotEmpty()
+  public email: string;
 
   @IsString()
   @MinLength(6)
-  password: string; // <--- Yahan change kiya hai (password_hash -> password)
+  public readonly password: string;
+
+  public constructor(values: CreateUserDto) {
+    Object.assign(this, values);
+  }
 }

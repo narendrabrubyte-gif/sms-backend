@@ -10,16 +10,16 @@ import { EnrollmentStatus } from '../entities/enrollment.entity';
 export class CreateEnrollmentDto {
   @IsUUID()
   @IsNotEmpty()
-  student_id: string;
+  public student_id: string;
 
   @IsUUID()
   @IsNotEmpty()
-  course_id: string;
+  public course_id: string;
 
   @IsDateString()
-  enrolled_on: string;
+  public enrolled_on: string;
 
   @IsOptional()
   @IsEnum(EnrollmentStatus)
-  status: EnrollmentStatus;
+  public status: EnrollmentStatus;
 }

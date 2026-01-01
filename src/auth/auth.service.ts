@@ -1,35 +1,50 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { EntityManager, Equal } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { UserService } from '../user/user.service';
+import { User } from '../user/entities/user.entity'; // ✅ Entity Import
+import { SignInDto } from './dto/sign-in.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly _logger = new Logger(AuthService.name);
+
   constructor(
-    private usersService: UserService,
-    private jwtService: JwtService,
+    @InjectEntityManager() private readonly _entityManager: EntityManager, // ✅ Direct DB Access
+    private readonly _jwtService: JwtService,
   ) {}
 
-  // Login Logic
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
-    const user = await this.usersService.findByEmail(email);
-    // Security Tip: User enumeration attack se bachne ke liye generic error message use karein
+  async signIn(signInDto: SignInDto): Promise<{ access_token: string }> {
+    const { email, password } = signInDto;
+
+    this._logger.log(`Login attempt for: ${email}`);
+
+    // 1. Get User with Password (Raw Entity)
+    const user = await this._entityManager.findOne(User, {
+      where: { email: Equal(email) },
+    });
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    // Note: Make sure aapke database entity mein field ka naam 'password_hash' hi ho
-    const isMatch = await bcrypt.compare(pass, user.password_hash);
+
+    // 2. Compare Password
+    // Note: DB column name 'password_hash' hai
+    const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    // 'sub' (Subject) standard claim hai user ID ke liye
+
+    // 3. Generate Token
     const payload = { sub: user.user_id, email: user.email, role: user.role };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this._jwtService.signAsync(payload),
     };
   }
+
   signOut() {
     return { message: 'Sign out successful' };
   }

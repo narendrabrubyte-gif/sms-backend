@@ -26,18 +26,18 @@ export class StudentController {
   constructor(private readonly studentsService: StudentService) {}
 
   @Post()
-  public async create(
+  public async addStudent(
     @Body() createStudentDto: CreateStudentDto,
   ): Promise<StudentDto> {
     return await this.studentsService.createStudent(createStudentDto);
   }
 
   @Get()
-  public async findAll(
+  public async getStudentList(
     @Query('search') search?: string,
     @Query('status') status?: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
   ): Promise<{
     data: StudentDto[];
     meta: { total: number; page: number; limit: number; last_page: number };
@@ -51,14 +51,14 @@ export class StudentController {
   }
 
   @Get(':id')
-  public async findOne(
+  public async getStudentById(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<StudentDto> {
     return await this.studentsService.getStudentById(id);
   }
 
   @Patch(':id')
-  public async update(
+  public async updateStudentInfo(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateStudentDto: UpdateStudentDto,
   ): Promise<StudentDto> {
@@ -67,7 +67,9 @@ export class StudentController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  public async removeStudent(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
     return await this.studentsService.deleteStudent(id);
   }
 }

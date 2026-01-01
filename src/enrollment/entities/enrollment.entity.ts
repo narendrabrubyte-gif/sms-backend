@@ -19,19 +19,19 @@ export class Enrollment {
 
   @OneToOne(() => Student, (student) => student.enrollment)
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  public student: Student;
 
   @ManyToOne(() => Course, (course) => course.enrollments)
   @JoinColumn({ name: 'course_id' })
-  course: Course;
+  public course: Course;
 
   @Column()
-  enrolled_on: string;
+  public enrolled_on: string;
 
   @Column({
     type: 'enum',
     enum: EnrollmentStatus,
     default: EnrollmentStatus.ACTIVE,
   })
-  status: EnrollmentStatus;
+  public status: EnrollmentStatus;
 }

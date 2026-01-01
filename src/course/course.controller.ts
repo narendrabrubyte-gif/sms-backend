@@ -8,11 +8,17 @@ import {
   Delete,
   UseGuards,
   Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CourseDto } from './dto/course.dto';
 
 @UseGuards(AuthGuard)
 @Controller('courses')
@@ -20,31 +26,44 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  create(@Body() CreateCourseDto: CreateCourseDto) {
-    return this.courseService.create(CreateCourseDto);
+  public async addCourse(
+    @Body() CreateCourseDto: CreateCourseDto,
+  ): Promise<CourseDto> {
+    return await this.courseService.createCourse(CreateCourseDto);
   }
 
   @Get()
-  findAll(
+  public async getCourseList(
     @Query('search') search?: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.courseService.findAll(search, Number(page), Number(limit));
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ): Promise<{
+    data: CourseDto[];
+    meta: { total: number; page: number; limit: number; last_page: number };
+  }> {
+    return await this.courseService.getCourseList(
+      search,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(id);
+  public async getCourseById(@Param('id') id: string): Promise<CourseDto> {
+    return await this.courseService.getCourseById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(id, updateCourseDto);
+  public async updateCourseInfo(
+    @Param('id') id: string,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ): Promise<CourseDto> {
+    return await this.courseService.updateCourse(id, updateCourseDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.courseService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async removeCourse(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.courseService.deleteCourse(id);
   }
 }

@@ -21,35 +21,35 @@ export class Mark {
 
   @ManyToOne(() => Student, (student) => student.marks)
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  public student: Student;
 
   @ManyToOne(() => Course, (course) => course.marks)
   @JoinColumn({ name: 'course_id' })
-  course: Course;
+  public course: Course;
 
   @Column({
     type: 'enum',
     enum: ExamType,
     default: ExamType.MIDTERM,
   })
-  exam_type: ExamType;
+  public exam_type: ExamType;
 
   @Column()
-  score: number;
+  public score: number;
 
   @Column()
-  max_score: number;
+  public max_score: number;
 
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  graded_at: Date;
+  public graded_at: Date;
 
-  grade: string;
+  public grade: string;
 
   @AfterLoad()
-  calculateGrade() {
+  public calculateGrade() {
     const percentage = (this.score / this.max_score) * 100;
     if (percentage >= 90) {
       this.grade = 'A';

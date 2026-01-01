@@ -3,12 +3,12 @@ import { IsString, IsNotEmpty } from 'class-validator';
 export class CreateCourseDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  public name: string;
 
   @IsString()
-  description: string;
+  public description: string;
 
   @IsString()
   @IsNotEmpty()
-  credits: string;
+  public credits: string;
 }
