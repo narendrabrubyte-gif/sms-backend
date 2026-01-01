@@ -48,6 +48,7 @@ export class EnrollmentService {
       student,
       course,
     });
+
     return await this.entityManager.save(enrollment);
   }
 

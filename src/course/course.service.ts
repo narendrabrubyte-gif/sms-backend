@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { Brackets, EntityManager } from 'typeorm';
+import { Brackets, EntityManager, Equal } from 'typeorm';
 import { CourseDto } from './dto/course.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -9,7 +9,7 @@ import { Course } from './entities/course.entity';
 
 @Injectable()
 export class CourseService {
-  constructor(
+  public constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
@@ -17,8 +17,12 @@ export class CourseService {
   public async createCourse(
     createCourseDto: CreateCourseDto,
   ): Promise<CourseDto> {
-    const course = this.entityManager.create(Course, createCourseDto);
-    return await this.entityManager.save(course);
+    return await this.entityManager.transaction(async (mangeCreateCourese) => {
+      const course = mangeCreateCourese.create(Course, createCourseDto);
+      const courseCreate = await mangeCreateCourese.save(course);
+
+      return CourseDto.createFromEntity(courseCreate);
+    });
   }
 
   public async getCourseList(
@@ -65,19 +69,32 @@ export class CourseService {
     if (!course) {
       throw new NotFoundException(`Course with ID ${course_id} not found`);
     }
-    return course;
+    return CourseDto.createFromEntity(course);
   }
   public async updateCourse(
     course_id: string,
     updateCourseDto: UpdateCourseDto,
   ): Promise<CourseDto> {
-    const course = await this.getCourseById(course_id);
-    Object.assign(course, updateCourseDto);
-    return await this.entityManager.save(course);
+    const course = await this.entityManager.findOne(Course, {
+      where: { course_id: Equal(course_id) },
+    });
+    if (!course) {
+      throw new NotFoundException(`Course Id ${course_id} is not found.`);
+    }
+
+    return await this.entityManager.transaction(async (manageCourseUpdate) => {
+      Object.assign(course, updateCourseDto);
+
+      const courseUpdate = await manageCourseUpdate.save(course);
+
+      return CourseDto.createFromEntity(courseUpdate);
+    });
   }
 
   public async deleteCourse(course_id: string): Promise<void> {
-    const course = await this.getCourseById(course_id);
+    const course = await this.entityManager.findOne(Course, {
+      where: { course_id },
+    });
     if (!course) {
       throw new NotFoundException(`Course with ID ${course_id} not found`);
     }

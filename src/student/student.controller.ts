@@ -23,7 +23,7 @@ import { StudentDto } from './dto/student.dto';
 @UseGuards(AuthGuard)
 @Controller('students')
 export class StudentController {
-  constructor(private readonly studentsService: StudentService) {}
+  public constructor(private readonly studentsService: StudentService) {}
 
   @Post()
   public async addStudent(

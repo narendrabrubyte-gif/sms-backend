@@ -11,4 +11,8 @@ export class CreateCourseDto {
   @IsString()
   @IsNotEmpty()
   public credits: string;
+
+  public constructor(values: CreateCourseDto) {
+    Object.assign(this, values);
+  }
 }

@@ -12,7 +12,7 @@ import { StudentDto } from './dto/student.dto';
 
 @Injectable()
 export class StudentService {
-  constructor(
+  public constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
@@ -28,7 +28,9 @@ export class StudentService {
       throw new BadRequestException('Student with this email already exists');
     }
     const student = this.entityManager.create(Student, createStudentDto);
-    return this.entityManager.save(student);
+    const saveStudent = await this.entityManager.save(student);
+
+    return StudentDto.createFromEntity(saveStudent);
   }
 
   public async getStudentsList(
@@ -83,20 +85,36 @@ export class StudentService {
     if (!student) {
       throw new NotFoundException(`Student with ID ${student_id} not found`);
     }
-    return student;
+    return StudentDto.createFromEntity(student);
   }
 
   public async updateStudent(
     student_id: string,
     updateStudentDto: UpdateStudentDto,
-  ) {
-    const student = await this.getStudentById(student_id);
+  ): Promise<StudentDto> {
+    const student = await this.entityManager.findOne(Student, {
+      where: { student_id },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student with ID${student_id} not found.`);
+    }
+
     Object.assign(student, updateStudentDto);
-    return await this.entityManager.save(student);
+
+    const studentUpdate = await this.entityManager.save(student);
+
+    return StudentDto.createFromEntity(studentUpdate);
   }
 
   public async deleteStudent(student_id: string): Promise<void> {
-    const student = await this.getStudentById(student_id);
+    const student = await this.entityManager.findOne(Student, {
+      where: { student_id },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student Id${student_id} is not found.`);
+    }
     await this.entityManager.remove(student);
   }
 }

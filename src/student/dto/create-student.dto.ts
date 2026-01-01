@@ -33,4 +33,8 @@ export class CreateStudentDto {
 
   @IsEnum(StudentStatus)
   public status: StudentStatus;
+
+  public constructor(values: CreateStudentDto) {
+    Object.assign(this, values);
+  }
 }

@@ -31,4 +31,8 @@ export class CreateAttendanceDto {
   @IsString()
   @IsOptional()
   public remarks: string;
+
+  public constructor(values: CreateAttendanceDto) {
+    Object.assign(this, values);
+  }
 }

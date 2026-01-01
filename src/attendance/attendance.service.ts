@@ -13,12 +13,12 @@ import { AttendanceDto } from './dto/attendance.dto';
 
 @Injectable()
 export class AttendanceService {
-  constructor(
+  public constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
 
-  async addAttendance(
+  public async addAttendance(
     createAttendanceDto: CreateAttendanceDto,
   ): Promise<AttendanceDto> {
     const { student_id, course_id, date, status, remarks } =

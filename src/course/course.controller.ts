@@ -23,7 +23,7 @@ import { CourseDto } from './dto/course.dto';
 @UseGuards(AuthGuard)
 @Controller('courses')
 export class CourseController {
-  constructor(private readonly courseService: CourseService) {}
+  public constructor(private readonly courseService: CourseService) {}
 
   @Post()
   public async addCourse(
@@ -63,7 +63,9 @@ export class CourseController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async removeCourse(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.courseService.deleteCourse(id);
+  public async removeCourse(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.courseService.deleteCourse(id);
   }
 }
