@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { Student } from '../../student/entities/student.entity';
@@ -17,7 +16,7 @@ export class Enrollment {
   @PrimaryGeneratedColumn('uuid')
   public readonly enrollment_id: string;
 
-  @OneToOne(() => Student, (student) => student.enrollment)
+  @ManyToOne(() => Student, (student) => student.enrollment)
   @JoinColumn({ name: 'student_id' })
   public student: Student;
 

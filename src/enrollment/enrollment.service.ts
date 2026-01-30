@@ -21,7 +21,7 @@ export class EnrollmentService {
       const { student_id, course_id } = createEnrollmentDto;
 
       const student = await enrollAddManage.findOne(Student, {
-        where: { student_id: Equal(student_id) },
+        where: { student_id: student_id },
       });
 
       if (!student) {
@@ -29,7 +29,7 @@ export class EnrollmentService {
       }
 
       const course = await enrollAddManage.findOne(Course, {
-        where: { course_id: Equal(course_id) },
+        where: { course_id: course_id },
       });
 
       if (!course) {
@@ -38,12 +38,12 @@ export class EnrollmentService {
 
       const exists = await enrollAddManage.findOne(Enrollment, {
         where: {
-          student: { student_id: Equal(student_id) },
-          course: { course_id: Equal(course_id) },
+          student: { student_id: student_id },
+          course: { course_id: course_id },
         },
       });
-
-      if (!exists) {
+      console.log(exists);
+      if (exists) {
         throw new NotFoundException(
           'Student is alreday enrolled in this course',
         );
