@@ -20,9 +20,19 @@ export class Attendance {
   @JoinColumn({ name: 'student_id' })
   student: Student;
 
-  @ManyToOne(() => Course, (course) => course.attendances)
-  @JoinColumn({ name: 'course_id' })
-  course: Course;
+  // @ManyToOne(() => Course, (course) => course.attendances)
+  // @JoinColumn({ name: 'course_id' })
+  // course: Course;
+
+
+@ManyToOne(() => Course, (course) => course.attendances, {
+  onDelete: 'CASCADE',
+})
+@JoinColumn({ name: 'course_id' })
+course: Course;
+
+
+
 
   @Column({ type: 'date' })
   date: Date;

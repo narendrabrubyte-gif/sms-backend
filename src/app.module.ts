@@ -25,6 +25,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true,
+      timezone: 'Z',
     }),
     StudentModule,
     UserModule,

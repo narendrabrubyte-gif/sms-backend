@@ -52,6 +52,7 @@ export class EnrollmentService {
       const enrollment = enrollAddManage.create(Enrollment, {
         student,
         course,
+        ...createEnrollmentDto,
       });
 
       const saveEnrollment = await enrollAddManage.save(enrollment);

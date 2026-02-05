@@ -27,15 +27,27 @@ export class Course {
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   public enrollments: Enrollment[];
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // public created_at: Date;
+
+  // @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // public updated_at: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
   public created_at: Date;
 
-  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp' })
   public updated_at: Date;
-
   @OneToMany(() => Mark, (mark) => mark.course)
   public marks: Mark[];
 
-  @OneToMany(() => Attendance, (attendance) => attendance.course)
-  public attendances: Attendance[];
+  // @OneToMany(() => Attendance, (attendance) => attendance.course)
+  // public attendances: Attendance[];
+
+
+  @OneToMany(() => Attendance, (attendance) => attendance.course, {
+  cascade: true,
+})
+public attendances: Attendance[];
+
 }

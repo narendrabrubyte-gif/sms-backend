@@ -107,6 +107,21 @@ export class StudentService {
     return StudentDto.createFromEntity(studentUpdate);
   }
 
+// async remove(id: string) {
+//   const student = await this.studentRepo.findOne({
+//     where: { student_id: id },
+//   });
+
+//   if (!student) {
+//     throw new NotFoundException('Student not found');
+//   }
+
+//   await this.studentRepo.delete(id);
+
+//   return { message: 'Student deleted successfully' };
+// }
+
+
   public async deleteStudent(student_id: string): Promise<void> {
     const student = await this.entityManager.findOne(Student, {
       where: { student_id },

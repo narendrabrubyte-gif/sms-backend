@@ -44,14 +44,25 @@ export class Student {
   @Column({ type: 'enum', enum: StudentStatus })
   public status: StudentStatus;
 
-  @OneToOne(() => Enrollment, (enrollment) => enrollment.student)
-  public enrollment: Enrollment;
+@OneToMany(() => Enrollment, (enrollment) => enrollment.student, {
+  cascade: true,
+})
+enrollment: Enrollment[];
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  public created_at: Date;
 
-  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  public updated_at: Date;
+  // @OneToOne(() => Enrollment, (enrollment) => enrollment.student)
+  // public enrollment: Enrollment;
+
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // public created_at: Date;
+
+  // @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // public updated_at: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 
   @OneToMany(() => Mark, (mark) => mark.student)
   public marks: Mark[];

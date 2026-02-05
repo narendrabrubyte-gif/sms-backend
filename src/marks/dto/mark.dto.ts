@@ -11,12 +11,10 @@ export class MarkDto {
 
   @Expose()
   @Type(() => StudentDto)
-  @IsUUID()
   public readonly student: StudentDto | null;
 
   @Expose()
   @Type(() => CourseDto)
-  @IsUUID()
   public course: CourseDto | null;
 
   @Expose()
