@@ -132,4 +132,8 @@ export class StudentService {
     }
     await this.entityManager.remove(student);
   }
+  findAll() {
+  return this.entityManager.find(Student);
+}
+
 }

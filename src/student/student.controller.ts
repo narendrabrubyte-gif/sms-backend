@@ -72,4 +72,9 @@ export class StudentController {
   ): Promise<void> {
     return await this.studentsService.deleteStudent(id);
   }
+
+  @Get()
+findAll() {
+  return this.studentsService.findAll();
+}
 }
