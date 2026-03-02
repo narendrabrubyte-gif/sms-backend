@@ -1,35 +1,37 @@
 /* eslint-disable prettier/prettier */
 import { Expose } from "class-transformer";
+import { IsEnum, IsUUID, IsString, IsNumber } from "class-validator";
 import { Book } from "../entities/book.entity";
 import { BookStatus } from "../enums/book-status.enum";
 
 export class BookResponseDto {
   @Expose()
-  id: string;
+  @IsUUID()
+  public readonly id: string;
 
   @Expose()
-  title: string;
+  @IsString()
+  public readonly title: string;
 
   @Expose()
-  bookClass: string;
+  @IsString()
+  public readonly bookClass: string;
 
   @Expose()
-  total_quantity: number;
+  @IsNumber()
+  public readonly total_quantity: number;
 
   @Expose()
-  status: BookStatus;
+  @IsEnum(BookStatus)
+  public readonly status: BookStatus;
 
-  constructor(partial: Partial<BookResponseDto>) {
-    Object.assign(this, partial);
+  public constructor(values: BookResponseDto) {
+    Object.assign(this, values);
   }
 
   public static createFromEntity(entity: Book): BookResponseDto {
     return new BookResponseDto({
-      id: entity.id,
-      title: entity.title,
-      bookClass: entity.bookClass,
-      total_quantity: entity.total_quantity,
-      status: entity.status,
+      ...entity
     });
   }
 }

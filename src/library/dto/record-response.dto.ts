@@ -1,64 +1,49 @@
-/* eslint-disable prettier/prettier */
-import { Expose, Type } from "class-transformer";
-import { BookAssignment } from "../entities/book-assignment.entity";
-import { BookStatus } from "../enums/book-status.enum";
+import { Expose, Type } from 'class-transformer';
+import { IsEnum, IsUUID, IsOptional } from 'class-validator';
+import { BookAssignment } from '../entities/book-assignment.entity';
+import { BookStatus } from '../enums/book-status.enum';
+import { StudentDto } from 'src/student/dto/student.dto';
+import { BookResponseDto } from './book-response.dto'; // assume ye already hai
 
 export class RecordResponseDto {
   @Expose()
-  id: string;
+  @IsUUID()
+  public readonly id: string;
 
   @Expose()
-  student?: {
-    id: string;
-    name: string;
-  };
+  @Type(() => StudentDto)
+  @IsOptional()
+  public readonly student: StudentDto | null;
 
   @Expose()
-  book?: {
-    id: string;
-    title: string;
-  };
+  @Type(() => BookResponseDto)
+  @IsOptional()
+  public readonly book: BookResponseDto | null;
 
   @Expose()
-  status: BookStatus;
+  @IsEnum(BookStatus)
+  public readonly status: BookStatus;
 
   @Expose()
-  issuedAt: Date;
+  public readonly issuedAt: Date;
 
   @Expose()
-  returnedAt?: Date | null;
+  public readonly returnedAt: Date | null;
 
-  constructor(partial: Partial<RecordResponseDto>) {
-    Object.assign(this, partial);
+  constructor(values: Partial<RecordResponseDto>) {
+    Object.assign(this, values);
   }
 
   static createFromEntity(entity: BookAssignment): RecordResponseDto {
     return new RecordResponseDto({
       id: entity.id,
-
       student: entity.student
-        ? {
-            id: entity.student.student_id,
-            name: `${entity.student.first_name} ${entity.student.last_name}`,
-          }
-        : {
-            id: "N/A",
-            name: "Deleted Student",
-          },
-
-      book: entity.book
-        ? {
-            id: entity.book.id,
-            title: entity.book.title,
-          }
-        : {
-            id: "N/A",
-            title: "Deleted Book",
-          },
-
+        ? StudentDto.createFromEntity(entity.student)
+        : null,
+      book: entity.book ? BookResponseDto.createFromEntity(entity.book) : null,
       status: entity.status,
       issuedAt: entity.issuedAt,
-      returnedAt: entity.returnedAt ?? null,
+      returnedAt: entity.returnedAt,
     });
   }
 }

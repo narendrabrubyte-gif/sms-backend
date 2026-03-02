@@ -69,4 +69,6 @@ enrollment: Enrollment[];
 
   @OneToMany(() => Attendance, (attendance) => attendance.student)
   public attendances: Attendance[];
+  name: string;
+  id: string;
 }

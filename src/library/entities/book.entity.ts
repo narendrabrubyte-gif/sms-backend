@@ -11,6 +11,9 @@ import { BookStatus } from '../enums/book-status.enum';
 
 @Entity('books')
 export class Book {
+  category(category: any): any {
+    throw new Error("Method not implemented.");
+  }
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
